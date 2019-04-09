@@ -1,7 +1,7 @@
 package com.netty.rpc.netty.provider;
 
-import com.netty.rpc.bean.RpcRequest;
-import com.netty.rpc.bean.RpcResponse;
+import com.netty.rpc.entity.RpcRequest;
+import com.netty.rpc.entity.RpcResponse;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

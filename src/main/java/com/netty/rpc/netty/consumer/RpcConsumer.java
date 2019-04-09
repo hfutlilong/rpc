@@ -1,7 +1,7 @@
 package com.netty.rpc.netty.consumer;
 
-import com.netty.rpc.bean.RpcRequest;
-import com.netty.rpc.bean.RpcResponse;
+import com.netty.rpc.entity.RpcRequest;
+import com.netty.rpc.entity.RpcResponse;
 import com.netty.rpc.netty.codec.RpcDecoder;
 import com.netty.rpc.netty.codec.RpcEncoder;
 import io.netty.bootstrap.Bootstrap;

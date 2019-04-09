@@ -1,4 +1,4 @@
-package com.netty.rpc.bean;
+package com.netty.rpc.entity;
 
 import java.io.Serializable;
 
