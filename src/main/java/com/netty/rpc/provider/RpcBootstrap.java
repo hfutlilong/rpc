@@ -1,4 +1,4 @@
-package com.netty.rpc.main;
+package com.netty.rpc.provider;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -10,6 +10,6 @@ public class RpcBootstrap
 {
     public static void main( String[] args )
     {
-        new ClassPathXmlApplicationContext("provider/application-server.xml");
+        new ClassPathXmlApplicationContext("provider/dubbo-consumer.xml");
     }
 }

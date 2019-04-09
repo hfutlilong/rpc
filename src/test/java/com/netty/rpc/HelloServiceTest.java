@@ -1,6 +1,6 @@
 package com.netty.rpc;
 
-import com.netty.rpc.client.proxy.RpcProxy;
+import com.netty.rpc.consumer.RpcProxy;
 import com.netty.rpc.service.HelloService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import javax.annotation.Resource;
  * 消费者启动类
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:consumer/application-client.xml"})
+@ContextConfiguration(locations = {"classpath:consumer/dubbo-consumer.xml"})
 public class HelloServiceTest {
     @Resource
     private RpcProxy rpcProxy;

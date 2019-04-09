@@ -18,7 +18,7 @@
     </bean>
 
     <!-- 配置RPC代理 -->
-    <bean id="rpcProxy" class="com.netty.rpc.client.proxy.RpcProxy">
+    <bean id="rpcProxy" class="com.netty.rpc.consumer.RpcProxy">
         <constructor-arg name="serviceDiscovery" ref="serviceDiscovery"/>
     </bean>
 </beans>

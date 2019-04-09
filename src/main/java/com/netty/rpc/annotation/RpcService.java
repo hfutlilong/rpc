@@ -1,4 +1,4 @@
-package com.netty.rpc.server;
+package com.netty.rpc.annotation;
 
 import org.springframework.stereotype.Component;
 

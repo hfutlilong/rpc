@@ -1,11 +1,12 @@
-package com.netty.rpc.server;
+package com.netty.rpc.netty;
 
-import com.netty.rpc.handler.RpcHandler;
+import com.netty.rpc.annotation.RpcService;
 import com.netty.rpc.bean.RpcRequest;
 import com.netty.rpc.bean.RpcResponse;
+import com.netty.rpc.netty.codec.RpcDecoder;
+import com.netty.rpc.netty.codec.RpcEncoder;
+import com.netty.rpc.provider.RpcChannelHandler;
 import com.netty.rpc.registry.ServiceRegistry;
-import com.netty.rpc.codec.RpcDecoder;
-import com.netty.rpc.codec.RpcEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -27,8 +28,8 @@ import java.util.Map;
 /**
  * RPC服务器
  */
-public class RpcServer implements ApplicationContextAware, InitializingBean{
-    private static final Logger LOGGER = LoggerFactory.getLogger(RpcServer.class);
+public class RpcProvider implements ApplicationContextAware, InitializingBean{
+    private static final Logger LOGGER = LoggerFactory.getLogger(RpcProvider.class);
 
     /* 服务地址 */
     private String serverAddress;
@@ -39,7 +40,7 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
     /*存放接口名与服务对象之间的映射关系*/
     private Map<String, Object> handlerMap = new HashMap<>();
 
-    public RpcServer(String serverAddress, ServiceRegistry serviceRegistry) {
+    public RpcProvider(String serverAddress, ServiceRegistry serviceRegistry) {
         this.serverAddress = serverAddress;
         this.serviceRegistry = serviceRegistry;
     }
@@ -75,7 +76,7 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
                                     //将RPC请求进行编码（为了返回响应）
                                     .addLast(new RpcEncoder(RpcResponse.class))
                                     //处理RPC请求
-                                    .addLast(new RpcHandler(handlerMap));
+                                    .addLast(new RpcChannelHandler(handlerMap));
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)

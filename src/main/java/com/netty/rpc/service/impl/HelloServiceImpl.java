@@ -1,7 +1,7 @@
 package com.netty.rpc.service.impl;
 
 
-import com.netty.rpc.server.RpcService;
+import com.netty.rpc.annotation.RpcService;
 import com.netty.rpc.service.HelloService;
 
 /**

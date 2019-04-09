@@ -1,4 +1,4 @@
-package com.netty.rpc.handler;
+package com.netty.rpc.provider;
 
 import com.netty.rpc.bean.RpcRequest;
 import com.netty.rpc.bean.RpcResponse;
@@ -16,13 +16,13 @@ import java.util.Map;
 /**
  * 处理RPC请求, 只需扩展 Netty 的SimpleChannelInboundHandler抽象类即可
  */
-public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
+public class RpcChannelHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RpcHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RpcChannelHandler.class);
 
     private final Map<String, Object> handlerMap;
 
-    public RpcHandler(Map<String, Object> handlerMap) {
+    public RpcChannelHandler(Map<String, Object> handlerMap) {
         this.handlerMap = handlerMap;
     }
 

@@ -18,8 +18,8 @@
     </bean>
 
     <!-- 配置RPC服务器 -->
-    <bean id="rpcServer" class="com.netty.rpc.server.RpcServer">
-        <constructor-arg name="serverAddress" value="${server.address}"/>
+    <bean id="rpcServer" class="com.netty.rpc.netty.RpcProvider">
+        <constructor-arg name="serverAddress" value="${provider.address}"/>
         <constructor-arg name="serviceRegistry" ref="serviceRegistry"/>
     </bean>
 </beans>

@@ -1,4 +1,4 @@
-package com.netty.rpc.util;
+package com.netty.rpc.netty.codec;
 
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;

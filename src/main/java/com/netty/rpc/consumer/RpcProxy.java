@@ -1,13 +1,13 @@
-package com.netty.rpc.client.proxy;
+package com.netty.rpc.consumer;
 
 import com.netty.rpc.bean.RpcRequest;
 import com.netty.rpc.bean.RpcResponse;
-import com.netty.rpc.client.RpcClient;
-import com.netty.rpc.registry.ServiceDiscovery;
+import com.netty.rpc.netty.RpcConsumer;
 import net.sf.cglib.proxy.InvocationHandler;
 import net.sf.cglib.proxy.Proxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.netty.rpc.registry.ServiceDiscovery;
 
 import java.lang.reflect.Method;
 import java.util.UUID;
@@ -57,7 +57,7 @@ public class RpcProxy {
                         int port = Integer.parseInt(array[1]);
 
                         //初始化RPC客户端
-                        RpcClient client = new RpcClient(host, port);
+                        RpcConsumer client = new RpcConsumer(host, port);
 
                         long startTime = System.currentTimeMillis();
                         //通过RPC客户端发送rpc请求并且获取rpc响应

@@ -1,9 +1,9 @@
-package com.netty.rpc.client;
+package com.netty.rpc.netty;
 
 import com.netty.rpc.bean.RpcRequest;
 import com.netty.rpc.bean.RpcResponse;
-import com.netty.rpc.codec.RpcDecoder;
-import com.netty.rpc.codec.RpcEncoder;
+import com.netty.rpc.netty.codec.RpcDecoder;
+import com.netty.rpc.netty.codec.RpcEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 /**
  * RPC客户端
  */
-public class RpcClient extends SimpleChannelInboundHandler<RpcResponse> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RpcClient.class);
+public class RpcConsumer extends SimpleChannelInboundHandler<RpcResponse> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RpcConsumer.class);
 
     /*主机名*/
     private String host;
@@ -32,7 +32,7 @@ public class RpcClient extends SimpleChannelInboundHandler<RpcResponse> {
 
     private final Object obj = new Object();
 
-    public RpcClient(String host, int port) {
+    public RpcConsumer(String host, int port) {
         this.host = host;
         this.port = port;
     }
@@ -68,7 +68,7 @@ public class RpcClient extends SimpleChannelInboundHandler<RpcResponse> {
                                     /*将RPC响应进行解码（返回响应）*/
                                     .addLast(new RpcDecoder(RpcResponse.class))
                                     /*使用RpcClient发送RPC请求*/
-                                    .addLast(RpcClient.this);
+                                    .addLast(RpcConsumer.this);
                         }
                     })
                     .option(ChannelOption.SO_KEEPALIVE, true);
