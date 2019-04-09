@@ -2,12 +2,12 @@ package com.netty.rpc.consumer;
 
 import com.netty.rpc.bean.RpcRequest;
 import com.netty.rpc.bean.RpcResponse;
-import com.netty.rpc.netty.RpcConsumer;
+import com.netty.rpc.netty.consumer.RpcConsumer;
+import com.netty.rpc.registry.ServiceDiscovery;
 import net.sf.cglib.proxy.InvocationHandler;
 import net.sf.cglib.proxy.Proxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.netty.rpc.registry.ServiceDiscovery;
 
 import java.lang.reflect.Method;
 import java.util.UUID;

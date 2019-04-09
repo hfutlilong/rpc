@@ -1,4 +1,4 @@
-package com.netty.rpc.netty;
+package com.netty.rpc.netty.consumer;
 
 import com.netty.rpc.bean.RpcRequest;
 import com.netty.rpc.bean.RpcResponse;
