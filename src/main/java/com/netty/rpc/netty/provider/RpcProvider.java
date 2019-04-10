@@ -35,11 +35,17 @@ public class RpcProvider implements ApplicationContextAware, InitializingBean{
     /* 服务注册中心 */
     private ServiceRegistry serviceRegistry;
 
+    /**
+     * 服务提供者端口号
+     */
+    private int servicePort;
+
     /*存放接口名与服务对象之间的映射关系*/
     private Map<String, Object> handlerMap = new HashMap<>();
 
-    public RpcProvider(ServiceRegistry serviceRegistry) {
+    public RpcProvider(ServiceRegistry serviceRegistry, int servicePort) {
         this.serviceRegistry = serviceRegistry;
+        this.servicePort = servicePort;
     }
 
     @Override
@@ -81,15 +87,14 @@ public class RpcProvider implements ApplicationContextAware, InitializingBean{
 
             //启动RPC服务端
             String host = NetwokUtils.getLocalhost(); // 服务地址
-            int port = Constant.PROVIDER_PORT; // 服务端口
             
-            ChannelFuture channelFuture = bootstrap.bind(host, port).sync();
-            LOGGER.debug("server started on port: {}", port);
+            ChannelFuture channelFuture = bootstrap.bind(host, servicePort).sync();
+            LOGGER.debug("server started on port: {}", servicePort);
 
             if(null != serviceRegistry){
-                String serverAddress = host + ":" + port;
+                String serverAddress = host + ":" + servicePort;
                 //注册服务地址
-                serviceRegistry.register(serverAddress);
+                serviceRegistry.register(handlerMap.keySet(), serverAddress);
                 LOGGER.debug("register service:{}", serverAddress);
             }
 

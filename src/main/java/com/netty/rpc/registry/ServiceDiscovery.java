@@ -87,7 +87,7 @@ public class ServiceDiscovery {
      */
     private void watchNode(final ZooKeeper zk){
         try {
-            List<String> nodeList = zk.getChildren(Constant.ZK_REGISTRY_ROOT_PATH, new Watcher() {
+            List<String> nodeList = zk.getChildren(Constant.ZkConstant.ZK_SEPERATOR + Constant.ZkConstant.SERVICE_ROOT_PATH, new Watcher() {
                 @Override
                 public void process(WatchedEvent watchedEvent) {
                     if(watchedEvent.getType() == Event.EventType.NodeChildrenChanged){
@@ -99,7 +99,7 @@ public class ServiceDiscovery {
             List<String> dataList = new ArrayList<>();
             byte[] bytes;
             for (String node : nodeList){
-                bytes = zk.getData(Constant.ZK_REGISTRY_ROOT_PATH + "/" + node, false, null);
+                bytes = zk.getData(Constant.ZkConstant.ZK_SEPERATOR + Constant.ZkConstant.SERVICE_ROOT_PATH + "/" + node, false, null);
                 dataList.add(new String(bytes));
             }
             LOGGER.debug("node data: {}", dataList);

@@ -20,5 +20,6 @@
     <!-- 配置RPC服务器 -->
     <bean id="rpcServer" class="com.netty.rpc.netty.provider.RpcProvider">
         <constructor-arg name="serviceRegistry" ref="serviceRegistry"/>
+        <constructor-arg name="servicePort" value="${service.port}" />
     </bean>
 </beans>

@@ -1,14 +1,19 @@
 package com.netty.rpc.registry;
 
 import com.netty.rpc.constant.Constant;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -17,66 +22,82 @@ import java.util.concurrent.CountDownLatch;
 public class ServiceRegistry {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistry.class);
 
-    /*计数器*/
-    private CountDownLatch latch = new CountDownLatch(1);
-
     /*注册地址*/
     private String registryAddress;
+
+    private CuratorFramework client;
 
     public ServiceRegistry(String registryAddress) {
         this.registryAddress = registryAddress;
     }
 
-    public void register(String data){
-        if(null != data){
-            /*连接zk服务*/
-            ZooKeeper zk = connectServer();
-            if(null != zk){
-                /*创建zk节点*/
-                createNode(zk, data);
-            }
+    public void register(Set<String> serviceNames, String serverAddress) throws Exception {
+        if (CollectionUtils.isEmpty(serviceNames)) {
+            return;
+        }
+
+        connectZkServer();
+
+        for (String serviceName : serviceNames) {
+            String watchPath = Constant.ZkConstant.ZK_SEPERATOR + Constant.ZkConstant.SERVICE_ROOT_PATH
+                    + Constant.ZkConstant.ZK_SEPERATOR + serviceName + Constant.ZkConstant.ZK_SEPERATOR
+                    + Constant.ZkConstant.ZK_PROVIDERS_PATH;
+
+            // 创建的临时节点示例：/registry/xxx.service/providers/data_0001
+            String dataPath = watchPath + Constant.ZkConstant.ZK_SEPERATOR + Constant.ZkConstant.ZK_PATH_PREFIX;
+            /* 创建zk节点 */
+            createZkNode(dataPath, serverAddress);
+//
+//            /* 注册监听 */
+//            watchZkNode(watchPath);
         }
     }
 
-    /**
-     * 连接服务
-     * @return
-     */
-    private ZooKeeper connectServer(){
-        ZooKeeper zk = null;
-        try {
-            zk = new ZooKeeper(registryAddress, Constant.ZK_SESSION_TIMEOUT, new Watcher() {
-                @Override
-                public void process(WatchedEvent watchedEvent) {
-                    // 判断是否已连接ZK,连接后计数器递减.
-                    if(watchedEvent.getState() == Event.KeeperState.SyncConnected){
-                        latch.countDown();
-                    }
-                }
-            });
-            // 若计数器不为0,则等待.
-            latch.await();
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.error("连接zk服务报错: {}", e.getMessage());
-        }
-        return zk;
+
+    private void connectZkServer() {
+        client = CuratorFrameworkFactory.newClient(registryAddress,
+                new ExponentialBackoffRetry(Constant.ZkConstant.BASE_SLEEP_TIME_MS,
+                        Constant.ZkConstant.MAX_RETRIES));
+        client.start();
+
+        addJvmHook();
     }
 
     /**
-     * 创建zk临时节点
-     * @param zk
+     * 创建zk临时顺序节点
+     *
+     * @param path
      * @param data
+     * @throws Exception
      */
-    private void createNode(ZooKeeper zk, String data){
-        try {
+    public void createZkNode(String path, String data) throws Exception {
+        if (StringUtils.isBlank(data)) {
+            client.create().creatingParentContainersIfNeeded().withProtection()
+                    .withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(path);
+        } else {
             byte[] bytes = data.getBytes();
-            // 创建 registry 节点（临时）
-            String path = zk.create(Constant.ZK_DATA_PATH, bytes, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
-            LOGGER.debug("create zookeeper node: ({} => {})", path, data);
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.error("创建zk节点出错：{}", e.getMessage());
+            client.create().creatingParentContainersIfNeeded().withProtection()
+                    .withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(path, bytes);
         }
+    }
+
+    /**
+     * 注册钩子
+     */
+    private void addJvmHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (client != null) {
+                client.close();
+            }
+
+//            if (cache != null) {
+//                try {
+//                    cache.close();
+//                } catch (IOException e) {
+//                    LOGGER.warn("close PathChildrenCache failed:{}.", e.getMessage(), e);
+//                }
+//            }
+
+        }));
     }
 }
