@@ -1,21 +1,16 @@
 package com.netty.rpc;
 
+import com.netty.rpc.base.BaseTest;
 import com.netty.rpc.consumer.RpcProxy;
 import com.netty.rpc.service.HelloService;
 import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
+import org.testng.annotations.Test;
 import javax.annotation.Resource;
 
 /**
  * 消费者启动类
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:consumer/dubbo-consumer.xml"})
-public class HelloServiceTest {
+public class HelloServiceTest extends BaseTest {
     @Resource
     private RpcProxy rpcProxy;
 

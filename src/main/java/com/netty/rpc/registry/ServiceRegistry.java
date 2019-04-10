@@ -1,82 +1,45 @@
 package com.netty.rpc.registry;
 
 import com.netty.rpc.constant.Constant;
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.ZooKeeper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Service;
 
-import java.util.concurrent.CountDownLatch;
+import javax.annotation.Resource;
+import java.util.Set;
 
 /**
  * 服务注册
  */
+@Service
 public class ServiceRegistry {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistry.class);
-
-    /*计数器*/
-    private CountDownLatch latch = new CountDownLatch(1);
-
-    /*注册地址*/
-    private String registryAddress;
-
-    public ServiceRegistry(String registryAddress) {
-        this.registryAddress = registryAddress;
-    }
-
-    public void register(String data){
-        if(null != data){
-            /*连接zk服务*/
-            ZooKeeper zk = connectServer();
-            if(null != zk){
-                /*创建zk节点*/
-                createNode(zk, data);
-            }
-        }
-    }
+    @Resource
+    private ZkService zkService;
 
     /**
-     * 连接服务
-     * @return
+     * 注册服务
+     *
+     * @param serviceNames
+     * @param host
+     * @param port
      */
-    private ZooKeeper connectServer(){
-        ZooKeeper zk = null;
-        try {
-            zk = new ZooKeeper(registryAddress, Constant.ZK_SESSION_TIMEOUT, new Watcher() {
-                @Override
-                public void process(WatchedEvent watchedEvent) {
-                    // 判断是否已连接ZK,连接后计数器递减.
-                    if(watchedEvent.getState() == Event.KeeperState.SyncConnected){
-                        latch.countDown();
-                    }
-                }
-            });
-            // 若计数器不为0,则等待.
-            latch.await();
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.error("连接zk服务报错: {}", e.getMessage());
+    public void register(Set<String> serviceNames, String host, int port) throws Exception {
+        if (CollectionUtils.isEmpty(serviceNames)) {
+            return;
         }
-        return zk;
-    }
+        String serverAddress = host + ":" + port;
 
-    /**
-     * 创建zk临时节点
-     * @param zk
-     * @param data
-     */
-    private void createNode(ZooKeeper zk, String data){
-        try {
-            byte[] bytes = data.getBytes();
-            // 创建 registry 节点（临时）
-            String path = zk.create(Constant.ZK_DATA_PATH, bytes, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
-            LOGGER.debug("create zookeeper node: ({} => {})", path, data);
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.error("创建zk节点出错：{}", e.getMessage());
+        for (String serviceName : serviceNames) {
+            String watchPath = Constant.ZkConstant.ZK_SEPERATOR + Constant.ZkConstant.SERVICE_ROOT_PATH
+                    + Constant.ZkConstant.ZK_SEPERATOR + serviceName + Constant.ZkConstant.ZK_SEPERATOR
+                    + Constant.ZkConstant.ZK_PROVIDERS_PATH;
+
+            // 创建的临时节点示例：/registry/xxx.service/providers/data_0001
+            String dataPath = watchPath + Constant.ZkConstant.ZK_SEPERATOR + Constant.ZkConstant.ZK_PATH_PREFIX;
+            /* 创建zk节点 */
+            zkService.createZkNode(dataPath, serverAddress);
+
+            /* 注册监听 */
+            zkService.watchZkNode(watchPath);
         }
     }
 }
