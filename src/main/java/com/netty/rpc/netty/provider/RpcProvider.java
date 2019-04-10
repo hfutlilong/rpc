@@ -1,6 +1,7 @@
 package com.netty.rpc.netty.provider;
 
 import com.netty.rpc.annotation.RpcService;
+import com.netty.rpc.constant.Constant;
 import com.netty.rpc.entity.RpcRequest;
 import com.netty.rpc.entity.RpcResponse;
 import com.netty.rpc.netty.codec.RpcDecoder;
@@ -19,34 +20,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * RPC服务器
  */
-@Service
-public class RpcProvider implements ApplicationContextAware, InitializingBean {
+public class RpcProvider implements ApplicationContextAware, InitializingBean{
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcProvider.class);
 
     /* 服务注册中心 */
-    @Resource
     private ServiceRegistry serviceRegistry;
 
     /*存放接口名与服务对象之间的映射关系*/
     private Map<String, Object> handlerMap = new HashMap<>();
 
-    /**
-     * RPC服务端口号
-     */
-    @Value("${rpc.service.port}")
-    private int rpcServicePort;
+    public RpcProvider(ServiceRegistry serviceRegistry) {
+        this.serviceRegistry = serviceRegistry;
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -87,17 +81,21 @@ public class RpcProvider implements ApplicationContextAware, InitializingBean {
 
             //启动RPC服务端
             String host = NetwokUtils.getLocalhost(); // 服务地址
+            int port = Constant.PROVIDER_PORT; // 服务端口
+            
+            ChannelFuture channelFuture = bootstrap.bind(host, port).sync();
+            LOGGER.debug("server started on port: {}", port);
 
-            ChannelFuture channelFuture = bootstrap.bind(host, rpcServicePort).sync();
-            LOGGER.debug("server started on port: {}", rpcServicePort);
-
-            //注册服务地址
-            serviceRegistry.register(handlerMap.keySet(), host, rpcServicePort);
-            LOGGER.debug("register service:{}:{}", host, rpcServicePort);
+            if(null != serviceRegistry){
+                String serverAddress = host + ":" + port;
+                //注册服务地址
+                serviceRegistry.register(serverAddress);
+                LOGGER.debug("register service:{}", serverAddress);
+            }
 
             //关闭RPC服务器
             channelFuture.channel().closeFuture().sync();
-        } finally {
+        }finally {
             workerGroup.shutdownGracefully();
             masterGroup.shutdownGracefully();
         }

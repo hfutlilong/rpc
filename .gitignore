@@ -1,27 +1,9 @@
-.classpath
-.project
-.idea/
-.vscode/
+# Created by .ignore support plugin (hsz.mobi)
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
 *.iml
-.settings/
-WEB-INF/classes/
-WEB-INF/lib/
-target/
-test-output/
-log/
-logs/
-/bin
-/test-output
-/build
-.DS_Store
-.mymetadata
-.externalToolBuilders
-.reviewboardrc
-.springBeans
-disconf/
-
-**/node_modules/*
-**/static/*
-package-lock.json
-*.log
-
+out
+gen

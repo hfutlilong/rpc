@@ -10,6 +10,6 @@ public class RpcBootstrap
 {
     public static void main( String[] args )
     {
-        new ClassPathXmlApplicationContext("applicationContext.xml");
+        new ClassPathXmlApplicationContext("provider/dubbo-provider.xml");
     }
 }
