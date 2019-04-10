@@ -1,11 +1,13 @@
 package com.netty.rpc.netty.provider;
 
 import com.netty.rpc.annotation.RpcService;
+import com.netty.rpc.constant.Constant;
 import com.netty.rpc.entity.RpcRequest;
 import com.netty.rpc.entity.RpcResponse;
 import com.netty.rpc.netty.codec.RpcDecoder;
 import com.netty.rpc.netty.codec.RpcEncoder;
 import com.netty.rpc.registry.ServiceRegistry;
+import com.netty.rpc.utils.NetwokUtils;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -30,17 +32,13 @@ import java.util.Map;
 public class RpcProvider implements ApplicationContextAware, InitializingBean{
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcProvider.class);
 
-    /* 服务地址 */
-    private String serverAddress;
-
     /* 服务注册中心 */
     private ServiceRegistry serviceRegistry;
 
     /*存放接口名与服务对象之间的映射关系*/
     private Map<String, Object> handlerMap = new HashMap<>();
 
-    public RpcProvider(String serverAddress, ServiceRegistry serviceRegistry) {
-        this.serverAddress = serverAddress;
+    public RpcProvider(ServiceRegistry serviceRegistry) {
         this.serviceRegistry = serviceRegistry;
     }
 
@@ -81,16 +79,15 @@ public class RpcProvider implements ApplicationContextAware, InitializingBean{
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            //解析IP地址和端口信息
-            String[] array = serverAddress.split(":");
-            String host = array[0];
-            int port = Integer.parseInt(array[1]);
-
             //启动RPC服务端
+            String host = NetwokUtils.getLocalhost(); // 服务地址
+            int port = Constant.PROVIDER_PORT; // 服务端口
+            
             ChannelFuture channelFuture = bootstrap.bind(host, port).sync();
             LOGGER.debug("server started on port: {}", port);
 
             if(null != serviceRegistry){
+                String serverAddress = host + ":" + port;
                 //注册服务地址
                 serviceRegistry.register(serverAddress);
                 LOGGER.debug("register service:{}", serverAddress);
