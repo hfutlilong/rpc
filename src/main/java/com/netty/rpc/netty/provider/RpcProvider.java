@@ -1,7 +1,6 @@
 package com.netty.rpc.netty.provider;
 
 import com.netty.rpc.annotation.RpcService;
-import com.netty.rpc.constant.Constant;
 import com.netty.rpc.entity.RpcRequest;
 import com.netty.rpc.entity.RpcResponse;
 import com.netty.rpc.netty.codec.RpcDecoder;
