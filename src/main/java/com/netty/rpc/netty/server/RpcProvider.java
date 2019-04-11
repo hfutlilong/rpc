@@ -82,7 +82,7 @@ public class RpcProvider implements ApplicationContextAware, InitializingBean {
                     }).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
 
             // 启动RPC服务端
-            String host = NetwokUtils.getLocalhost(); // 服务地址
+            String host = NetwokUtils.getLocalhost(); // 获取本机地址
 
             ChannelFuture channelFuture = bootstrap.bind(host, servicePort).sync();
             LOGGER.debug("server started on port: {}", servicePort);
@@ -90,7 +90,7 @@ public class RpcProvider implements ApplicationContextAware, InitializingBean {
             if (null != serviceRegistry) {
                 String serverAddress = host + ":" + servicePort;
                 // 注册服务地址
-                serviceRegistry.register(handlerMap.keySet(), serverAddress);
+                serviceRegistry.registerProvider(handlerMap.keySet(), serverAddress);
                 LOGGER.debug("register service:{}", serverAddress);
             }
 

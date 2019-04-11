@@ -25,5 +25,12 @@ public class HelloServiceTest {
         String result = helloService.hello("world");
         System.out.println("============>result: " + result);
         Assert.assertEquals("Hello! world", result);
+
+
+        try {
+            Thread.sleep(5 * 60 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
