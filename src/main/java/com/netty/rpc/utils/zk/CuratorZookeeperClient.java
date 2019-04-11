@@ -22,20 +22,22 @@ import org.apache.zookeeper.Watcher.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class CuratorZookeeperClient {
 
     private final int CONNECT_TIMEOUT = 15000;
+
     private final int RETRY_TIME = Integer.MAX_VALUE;
+
     private final int RETRY_INTERVAL = 1000;
+
     private static final Logger logger = LoggerFactory.getLogger(CuratorZookeeperClient.class);
+
     private CuratorFramework curator;
 
     private volatile static CuratorZookeeperClient instance;
 
     /**
-     * key:父路径，如/jobcenter/client/goodscenter
-     * value：Map-->key:子路径，如/jobcenter/client/goodscenter/goodscenter00000001
+     * key:父路径，如/jobcenter/client/goodscenter value：Map-->key:子路径，如/jobcenter/client/goodscenter/goodscenter00000001
      * value:路径中的值
      */
     private static ConcurrentHashMap<String, Map<String, String>> zkCacheMap = new ConcurrentHashMap<String, Map<String, String>>();
@@ -46,8 +48,7 @@ public class CuratorZookeeperClient {
 
     private CuratorFramework newCurator(String zkServers) {
         return CuratorFrameworkFactory.builder().connectString(zkServers)
-                .retryPolicy(new RetryNTimes(RETRY_TIME, RETRY_INTERVAL))
-                .connectionTimeoutMs(CONNECT_TIMEOUT).build();
+                .retryPolicy(new RetryNTimes(RETRY_TIME, RETRY_INTERVAL)).connectionTimeoutMs(CONNECT_TIMEOUT).build();
     }
 
     private CuratorZookeeperClient(String zkServers) {
@@ -56,14 +57,14 @@ public class CuratorZookeeperClient {
             curator.getConnectionStateListenable().addListener(new ConnectionStateListener() {
                 public void stateChanged(CuratorFramework client, ConnectionState state) {
                     if (state == ConnectionState.LOST) {
-                        //连接丢失
+                        // 连接丢失
                         logger.info("lost session with zookeeper");
                     } else if (state == ConnectionState.CONNECTED) {
-                        //连接新建
+                        // 连接新建
                         logger.info("connected with zookeeper");
                     } else if (state == ConnectionState.RECONNECTED) {
                         logger.info("reconnected with zookeeper");
-                        //连接重连
+                        // 连接重连
                         for (ZkStateListener s : stateListeners) {
                             s.reconnected();
                         }
@@ -96,15 +97,13 @@ public class CuratorZookeeperClient {
      */
     public String write(String path, String content) throws Exception {
         StringBuilder sb = new StringBuilder(path);
-        String writePath = curator.create().creatingParentsIfNeeded()
-                .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)
+        String writePath = curator.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL_SEQUENTIAL)
                 .forPath(sb.toString(), content.getBytes("utf-8"));
         return writePath;
     }
 
     /**
-     * 随机读取一个path子路径
-     * 先从cache中读取，如果没有，再从zookeeper中查询
+     * 随机读取一个path子路径 先从cache中读取，如果没有，再从zookeeper中查询
      *
      * @param path
      * @return
@@ -131,8 +130,7 @@ public class CuratorZookeeperClient {
             Random rand = new Random();
             String child = list.get(rand.nextInt(list.size()));
             path = path + "/" + child;
-            byte[] b = curator.getData().usingWatcher(new ZKWatcher(parentPath, path))
-                    .forPath(path);
+            byte[] b = curator.getData().usingWatcher(new ZKWatcher(parentPath, path)).forPath(path);
             String value = new String(b, "utf-8");
             if (StringUtils.isNotBlank(value)) {
                 cacheMap.put(path, value);
@@ -143,8 +141,7 @@ public class CuratorZookeeperClient {
     }
 
     /**
-     * 读取path下所有子路径下的内容
-     * 先从map中读取，如果不存在，再从zookeeper中查询
+     * 读取path下所有子路径下的内容 先从map中读取，如果不存在，再从zookeeper中查询
      *
      * @param path
      * @return
@@ -173,8 +170,7 @@ public class CuratorZookeeperClient {
                 String basePath = path;
                 for (String child : children) {
                     path = basePath + "/" + child;
-                    byte[] b = curator.getData().usingWatcher(new ZKWatcher(parentPath, path))
-                            .forPath(path);
+                    byte[] b = curator.getData().usingWatcher(new ZKWatcher(parentPath, path)).forPath(path);
                     String value = new String(b, "utf-8");
                     if (StringUtils.isNotBlank(value)) {
                         list.add(value);
@@ -237,6 +233,7 @@ public class CuratorZookeeperClient {
      */
     private class ZKWatcher implements CuratorWatcher {
         private String parentPath;
+
         private String path;
 
         public ZKWatcher(String parentPath, String path) {
@@ -249,19 +246,18 @@ public class CuratorZookeeperClient {
             if (cacheMap == null) {
                 cacheMap = new HashMap<String, String>();
             }
-            if (event.getType() == Event.EventType.NodeDataChanged
-                    || event.getType() == Event.EventType.NodeCreated) {
-                byte[] data = curator.getData().
-                        usingWatcher(this).forPath(path);
+            if (event.getType() == Event.EventType.NodeDataChanged || event.getType() == Event.EventType.NodeCreated) {
+                byte[] data = curator.getData().usingWatcher(this).forPath(path);
                 cacheMap.put(path, new String(data, "utf-8"));
                 logger.info("add cache={}", new String(data, "utf-8"));
             } else if (event.getType() == Event.EventType.NodeDeleted) {
                 cacheMap.remove(path);
                 logger.info("remove cache path={}", path);
             } else if (event.getType() == Event.EventType.NodeChildrenChanged) {
-                //子节点发生变化，重新进行缓存
+                // 子节点发生变化，重新进行缓存
                 cacheMap.clear();
-                List<String> children = curator.getChildren().usingWatcher(new ZKWatcher(parentPath, path)).forPath(path);
+                List<String> children = curator.getChildren().usingWatcher(new ZKWatcher(parentPath, path))
+                        .forPath(path);
                 if (children != null && children.size() > 0) {
                     for (String child : children) {
                         String childPath = parentPath + "/" + child;

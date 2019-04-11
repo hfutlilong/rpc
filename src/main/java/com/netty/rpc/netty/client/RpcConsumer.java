@@ -23,11 +23,13 @@ import org.slf4j.LoggerFactory;
 public class RpcConsumer extends SimpleChannelInboundHandler<RpcResponse> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcConsumer.class);
 
-    /*主机名*/
+    /* 主机名 */
     private String host;
-    /*端口*/
+
+    /* 端口 */
     private int port;
-    /*RPC响应对象*/
+
+    /* RPC响应对象 */
     private RpcResponse response;
 
     private final Object obj = new Object();
@@ -40,8 +42,8 @@ public class RpcConsumer extends SimpleChannelInboundHandler<RpcResponse> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcResponse response) throws Exception {
         this.response = response;
-        synchronized (obj){
-            //收到响应，唤醒线程
+        synchronized (obj) {
+            // 收到响应，唤醒线程
             obj.notifyAll();
         }
     }
@@ -55,36 +57,33 @@ public class RpcConsumer extends SimpleChannelInboundHandler<RpcResponse> {
     public RpcResponse send(RpcRequest request) throws Exception {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
-            //创建并初始化Netty客户端bootstrap对象
+            // 创建并初始化Netty客户端bootstrap对象
             Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(group)
-                    .channel(NioSocketChannel.class)
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline()
-                                    /*将RPC请求进行编码（发送请求）*/
-                                    .addLast(new RpcEncoder(RpcRequest.class))
-                                    /*将RPC响应进行解码（返回响应）*/
-                                    .addLast(new RpcDecoder(RpcResponse.class))
-                                    /*使用RpcClient发送RPC请求*/
-                                    .addLast(RpcConsumer.this);
-                        }
-                    })
-                    .option(ChannelOption.SO_KEEPALIVE, true);
+            bootstrap.group(group).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
+                @Override
+                protected void initChannel(SocketChannel socketChannel) throws Exception {
+                    socketChannel.pipeline()
+                            /* 将RPC请求进行编码（发送请求） */
+                            .addLast(new RpcEncoder(RpcRequest.class))
+                            /* 将RPC响应进行解码（返回响应） */
+                            .addLast(new RpcDecoder(RpcResponse.class))
+                            /* 使用RpcClient发送RPC请求 */
+                            .addLast(RpcConsumer.this);
+                }
+            }).option(ChannelOption.SO_KEEPALIVE, true);
 
-            //连接RPC服务器
+            // 连接RPC服务器
             ChannelFuture future = bootstrap.connect(host, port).sync();
-            //写入RPC请求数据
+            // 写入RPC请求数据
             future.channel().writeAndFlush(request).sync();
 
-            synchronized (obj){
-                //未收到响应，使线程继续等待
+            synchronized (obj) {
+                // 未收到响应，使线程继续等待
                 obj.wait();
             }
 
-            if(null != response){
-                //关闭RPC请求连接
+            if (null != response) {
+                // 关闭RPC请求连接
                 future.channel().closeFuture().sync();
             }
             return response;

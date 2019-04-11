@@ -16,24 +16,26 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class SerializationUtil {
 
     private static Map<Class<?>, Schema<?>> cachedSchema = new ConcurrentHashMap<>();
+
     private static Objenesis objenesis = new ObjenesisStd(true);
 
-    private SerializationUtil(){
+    private SerializationUtil() {
 
     }
 
     /**
      * 获取schema对象，优先从缓存中取，没有就构建一个
+     * 
      * @param cls
      * @param <T>
      * @return
      */
     @SuppressWarnings("unchecked")
-    private static <T> Schema<T> getSchema(Class<T> cls){
+    private static <T> Schema<T> getSchema(Class<T> cls) {
         Schema<T> schema = (Schema<T>) cachedSchema.get(cls);
-        if(null == schema){
+        if (null == schema) {
             schema = RuntimeSchema.createFrom(cls);
-            if(null != schema){
+            if (null != schema) {
                 cachedSchema.put(cls, schema);
             }
         }
@@ -42,12 +44,13 @@ public final class SerializationUtil {
 
     /**
      * 序列化（对象 -> 字节数组）
+     * 
      * @param obj 被序列化的对象
      * @param <T> 返回序列化之后的字节数组
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static <T> byte[] serialize(T obj){
+    public static <T> byte[] serialize(T obj) {
         Class<T> cls = (Class<T>) obj.getClass();
         LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
 
@@ -63,15 +66,16 @@ public final class SerializationUtil {
 
     /**
      * 反序列化（字节数组 -> 对象）
+     * 
      * @param data 被反序列化的字节数组
      * @param cls 反序列化之后的对象
      * @param <T> 返回的对象类型
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static <T> T deSerialize(byte[] data, Class<T> cls){
+    public static <T> T deSerialize(byte[] data, Class<T> cls) {
         try {
-            T message = (T)objenesis.newInstance(cls);
+            T message = (T) objenesis.newInstance(cls);
             Schema<T> schema = getSchema(cls);
             ProtostuffIOUtil.mergeFrom(data, message, schema);
             return message;

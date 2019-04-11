@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * RPC注解
  */
-@Target({ElementType.TYPE})
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Component
 public @interface RpcService {

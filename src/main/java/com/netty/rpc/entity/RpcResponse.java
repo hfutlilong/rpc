@@ -7,11 +7,14 @@ import java.io.Serializable;
  */
 public class RpcResponse implements Serializable {
     private static final long serialVersionUID = 3374714188555167852L;
-    /*响应ID*/
+
+    /* 响应ID */
     private String reponseId;
-    /*异常对象*/
+
+    /* 异常对象 */
     private Throwable error;
-    /*响应结果*/
+
+    /* 响应结果 */
     private Object result;
 
     public static long getSerialVersionUID() {
@@ -42,7 +45,7 @@ public class RpcResponse implements Serializable {
         this.result = result;
     }
 
-    public boolean hasError(){
+    public boolean hasError() {
         return error != null;
     }
 }
