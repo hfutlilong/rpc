@@ -1,4 +1,4 @@
-package com.netty.rpc.netty.consumer;
+package com.netty.rpc.netty.client;
 
 import com.netty.rpc.entity.RpcRequest;
 import com.netty.rpc.entity.RpcResponse;

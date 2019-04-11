@@ -1,4 +1,4 @@
-package com.netty.rpc.netty.provider;
+package com.netty.rpc.netty.server;
 
 import com.netty.rpc.annotation.RpcService;
 import com.netty.rpc.entity.RpcRequest;

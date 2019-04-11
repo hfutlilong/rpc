@@ -24,10 +24,6 @@ public class ServiceDiscovery {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceDiscovery.class);
 
-    private CountDownLatch latch = new CountDownLatch(1);
-
-    // private volatile List<String> dataList = new ArrayList<>();
-
     /* 保存服务提供者地址 */
     private volatile Map<String, List<String>> serviceProviderMap = new ConcurrentHashMap<>();
 
