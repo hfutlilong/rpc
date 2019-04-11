@@ -1,7 +1,10 @@
 package com.netty.rpc;
 
+import com.alibaba.fastjson.JSON;
 import com.netty.rpc.consumer.RpcProxy;
+import com.netty.rpc.entity.SoaVO;
 import com.netty.rpc.service.HelloService;
+import com.netty.rpc.soa.SoaService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,6 +12,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 消费者启动类
@@ -19,6 +24,9 @@ public class HelloServiceTest {
     @Resource
     private RpcProxy rpcProxy;
 
+    @Resource
+    private SoaService soaService;
+
     @Test
     public void helloTest(){
         HelloService helloService = rpcProxy.create(HelloService.class);
@@ -26,6 +34,8 @@ public class HelloServiceTest {
         System.out.println("============>result: " + result);
         Assert.assertEquals("Hello! world", result);
 
+        Map<String, SoaVO> soaVOMap = soaService.getAllServices();
+        System.out.println("####### SOA：" + JSON.toJSONString(soaVOMap));
 
         try {
             Thread.sleep(5 * 60 * 1000);

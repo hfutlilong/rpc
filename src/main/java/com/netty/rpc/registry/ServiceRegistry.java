@@ -3,11 +3,7 @@ package com.netty.rpc.registry;
 import com.netty.rpc.constant.Constant;
 import com.netty.rpc.utils.ZkUtil;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.zookeeper.CreateMode;
 
 import java.util.Set;
 

@@ -221,4 +221,12 @@ public class ServiceDiscovery {
 
         return childrenContent;
     }
+
+    public Map<String, List<String>> getServiceProviderMap() {
+        return serviceProviderMap;
+    }
+
+    public Map<String, List<String>> getServiceConsumerMap() {
+        return serviceConsumerMap;
+    }
 }

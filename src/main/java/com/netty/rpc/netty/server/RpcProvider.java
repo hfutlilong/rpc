@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * RPC服务器
+ * RPC服务端
  */
 public class RpcProvider implements ApplicationContextAware, InitializingBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcProvider.class);
