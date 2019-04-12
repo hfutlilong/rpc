@@ -45,6 +45,26 @@ public class ZkUtil {
     }
 
     /**
+     *  删除一个节点
+     * @param client
+     * @param path
+     * @throws Exception
+     */
+    public static void deleteZkNode(CuratorFramework client, String path) throws Exception {
+        client.delete().forPath(path);
+    }
+
+    /**
+     * 删除一个节点，并递归删除所有子节点
+     * @param client
+     * @param path
+     * @throws Exception
+     */
+    public static void deleteZkNodeWithChildren(CuratorFramework client, String path) throws Exception {
+        client.delete().deletingChildrenIfNeeded().forPath(path);
+    }
+
+    /**
      * 注册钩子
      */
     public static void addJvmHook(CuratorFramework client) {
