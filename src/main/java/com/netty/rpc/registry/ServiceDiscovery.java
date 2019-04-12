@@ -99,13 +99,6 @@ public class ServiceDiscovery {
                 + Constant.ZkConstant.ZK_PATH_PREFIX;
         /* 创建zk节点 */
         ZkUtil.createZkNode(client, dataPath, host);
-
-
-        // TODO 测试代码
-        ZkUtil.createZkNode(client, dataPath, "192.168.0.1");
-        ZkUtil.createZkNode(client, dataPath, "192.168.0.2");
-        ZkUtil.createZkNode(client, dataPath, "192.168.0.3");
-        ZkUtil.createZkNode(client, dataPath, "192.168.0.4");
     }
 
     /**

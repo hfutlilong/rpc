@@ -36,12 +36,6 @@ public class ServiceRegistry {
                     + Constant.ZkConstant.ZK_PATH_PREFIX;
             /* 创建zk节点 */
             ZkUtil.createZkNode(client, dataPath, serverAddress);
-
-            // TODO 测试代码
-            ZkUtil.createZkNode(client, dataPath, "1.2.3.4:8080");
-            ZkUtil.createZkNode(client, dataPath, "2.3.4.5:8181");
-            ZkUtil.createZkNode(client, dataPath, "3.4.5.6:8282");
-
         }
 
         ZkUtil.addJvmHook(client);
