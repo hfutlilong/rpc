@@ -6,7 +6,7 @@ import com.netty.rpc.service.HelloService;
 /**
  * 实现服务接口
  */
-@RpcService(HelloService.class)
+@RpcService
 public class HelloServiceImpl implements HelloService {
     @Override
     public String hello(String name) {

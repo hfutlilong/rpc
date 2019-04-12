@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.netty.rpc.consumer.RpcProxy;
 import com.netty.rpc.entity.SoaVO;
 import com.netty.rpc.service.HelloService;
+import com.netty.rpc.service.ThankYouService;
 import com.netty.rpc.soa.SoaService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,7 +13,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,6 +33,11 @@ public class HelloServiceTest {
         String result = helloService.hello("world");
         System.out.println("============>result: " + result);
         Assert.assertEquals("Hello! world", result);
+
+        ThankYouService thankYouService = rpcProxy.create(ThankYouService.class);
+        result = thankYouService.thankYou("猴赛雷");
+        System.out.println("============>result: " + result);
+        Assert.assertEquals("Thank you, 猴赛雷", result);
 
         Map<String, SoaVO> soaVOMap = soaService.getAllServices();
         System.out.println("####### SOA：" + JSON.toJSONString(soaVOMap));
